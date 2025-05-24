@@ -148,6 +148,16 @@ void HandshakePlaceBuffersPass::runDynamaticPass() {
   auto func = allAlgorithms[algorithm];
   if (failed(((*this).*(func))()))
     return signalPassFailure();
+
+  // run the delay selection logic again, writing it to the IR for processing in
+  // the backend - placeholder logic writes targetCP for testing
+  modOp.walk([&](mlir::Operation *op) {
+    if (llvm::isa<dynamatic::handshake::ArithOpInterface>(op)) {
+      op->setAttr("selected_delay",
+                  mlir::FloatAttr::get(
+                      mlir::FloatType::getF64(op->getContext()), targetCP));
+    }
+  });
 }
 
 #ifndef DYNAMATIC_GUROBI_NOT_INSTALLED
@@ -436,7 +446,7 @@ static void logCFDFCUnions(FuncInfo &info, Logger &log,
 template <typename MILP, typename... Args>
 static inline LogicalResult
 checkLoggerAndSolve(Logger *logger, StringRef milpName,
-                    BufferPlacement &placement, Args &&...args) {
+                    BufferPlacement &placement, Args &&... args) {
   if (logger) {
     return solveMILP<MILP>(placement, std::forward<Args>(args)..., *logger,
                            milpName);
@@ -535,9 +545,9 @@ LogicalResult HandshakePlaceBuffersPass::placeWithoutUsingMILP() {
     // buffers at the same time
     BufferPlacement placement;
     for (auto &[channel, props] : channelProps) {
-      PlacementResult result;  
-      result.numOneSlotDV = props.minOpaque;  
-      result.numOneSlotR  = props.minTrans;  
+      PlacementResult result;
+      result.numOneSlotDV = props.minOpaque;
+      result.numOneSlotR = props.minTrans;
       placement[channel] = result;
     }
     instantiateBuffers(placement);
@@ -556,7 +566,8 @@ void HandshakePlaceBuffersPass::instantiateBuffers(BufferPlacement &placement) {
     builder.setInsertionPoint(opDst);
 
     Value bufferIn = channel;
-    auto placeBuffer = [&](const TimingInfo &timing, const StringRef &bufferType, unsigned numSlots) {
+    auto placeBuffer = [&](const TimingInfo &timing,
+                           const StringRef &bufferType, unsigned numSlots) {
       if (numSlots == 0)
         return;
 
@@ -577,8 +588,10 @@ void HandshakePlaceBuffersPass::instantiateBuffers(BufferPlacement &placement) {
       for (unsigned int i = 0; i < placeRes.numOneSlotDV; i++) {
         placeBuffer(TimingInfo::break_dv(), BufferOp::ONE_SLOT_BREAK_DV, 1);
       }
-      placeBuffer(TimingInfo::break_dv(), BufferOp::FIFO_BREAK_DV, placeRes.numFifoDV);
-      placeBuffer(TimingInfo::break_none(), BufferOp::FIFO_BREAK_NONE, placeRes.numFifoNone);
+      placeBuffer(TimingInfo::break_dv(), BufferOp::FIFO_BREAK_DV,
+                  placeRes.numFifoDV);
+      placeBuffer(TimingInfo::break_none(), BufferOp::FIFO_BREAK_NONE,
+                  placeRes.numFifoNone);
       for (unsigned int i = 0; i < placeRes.numOneSlotR; i++) {
         placeBuffer(TimingInfo::break_r(), BufferOp::ONE_SLOT_BREAK_R, 1);
       }
@@ -586,8 +599,10 @@ void HandshakePlaceBuffersPass::instantiateBuffers(BufferPlacement &placement) {
       for (unsigned int i = 0; i < placeRes.numOneSlotR; i++) {
         placeBuffer(TimingInfo::break_r(), BufferOp::ONE_SLOT_BREAK_R, 1);
       }
-      placeBuffer(TimingInfo::break_none(), BufferOp::FIFO_BREAK_NONE, placeRes.numFifoNone);
-      placeBuffer(TimingInfo::break_dv(), BufferOp::FIFO_BREAK_DV, placeRes.numFifoDV);
+      placeBuffer(TimingInfo::break_none(), BufferOp::FIFO_BREAK_NONE,
+                  placeRes.numFifoNone);
+      placeBuffer(TimingInfo::break_dv(), BufferOp::FIFO_BREAK_DV,
+                  placeRes.numFifoDV);
       for (unsigned int i = 0; i < placeRes.numOneSlotDV; i++) {
         placeBuffer(TimingInfo::break_dv(), BufferOp::ONE_SLOT_BREAK_DV, 1);
       }
