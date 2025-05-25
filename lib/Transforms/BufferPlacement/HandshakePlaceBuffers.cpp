@@ -150,12 +150,26 @@ void HandshakePlaceBuffersPass::runDynamaticPass() {
     return signalPassFailure();
 
   // run the delay selection logic again, writing it to the IR for processing in
-  // the backend - placeholder logic writes targetCP for testing
+  // the backend - placeholder logic writes targetCP for testing.
+  // In order tp avoid interleaving this IR writing with the value extraction,
+  // we keep it seperate. this does mean redudant logic, but the Database
+  // parsing is not a performance bottleneck, so this should be acceptable.
+
+  TimingDatabase timingDB(&getContext());
+  if (failed(TimingDatabase::readFromJSON(timingModels, timingDB)))
+    llvm::errs() << "=== TimindDB read failed ===\n";
+  else
+    llvm::errs() << "=== TimindDB read succeeded ===\n";
   modOp.walk([&](mlir::Operation *op) {
     if (llvm::isa<dynamatic::handshake::ArithOpInterface>(op)) {
+      double delay;
+      if (!failed(timingDB.getInternalCombinationalDelay(op, SignalType::DATA,
+                                                         delay, targetCP)))
+        llvm::errs() << "written delay value: " << delay << "\n";
+
       op->setAttr("selected_delay",
                   mlir::FloatAttr::get(
-                      mlir::FloatType::getF64(op->getContext()), targetCP));
+                      mlir::FloatType::getF64(op->getContext()), delay));
     }
   });
 }

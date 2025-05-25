@@ -108,7 +108,7 @@ public:
   /// choices may be made.
 
   LogicalResult getDelayCeilMetric(double targetPeriod, M &metric) const {
-    std::optional<unsigned> opDelayCeil;
+    std::optional<double> opDelayCeil; // TBD if unsigned or double
     M metricFloor = 0.0;
 
     // Find highest delay that's <= targetPeriod
@@ -125,6 +125,25 @@ public:
       return failure();
 
     metric = metricFloor;
+    return success();
+  }
+
+  LogicalResult getDelayCeilValue(double targetPeriod, double &delay) const {
+    std::optional<double> opDelayCeil;
+
+    // Find highest delay that's <= targetPeriod
+    for (const auto &[opDelay, val] : data) {
+      if (opDelay <= targetPeriod) {
+        if (!opDelayCeil.has_value() || *opDelayCeil < opDelay) {
+          opDelayCeil = opDelay;
+        }
+      }
+    }
+
+    if (!opDelayCeil.has_value())
+      return failure();
+
+    delay = *opDelayCeil;
     return success();
   }
 };
@@ -239,6 +258,11 @@ public:
   /// to return the real latency for those signal types too.
   LogicalResult getLatency(Operation *op, SignalType signalType,
                            double &latency, double targetPeriod) const;
+
+  LogicalResult getInternalCombinationalDelay(Operation *op,
+                                              SignalType signalType,
+                                              double &delay,
+                                              double targetPeriod) const;
 
   /// Attempts to get an operation's internal delay for a specific signal type.
   /// On success, sets the last argument to the requested delay.
