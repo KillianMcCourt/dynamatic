@@ -649,6 +649,8 @@ ModuleDiscriminator::ModuleDiscriminator(Operation *op) {
             handshake::AbsFOp>([&](auto) {
         // Bitwidth
         addType("DATA_TYPE", op->getOperand(0));
+        if (auto delayAttr = op->getAttrOfType<FloatAttr>("selected_delay"))
+          addParam("SELECTED_DELAY", delayAttr);
       })
       .Case<handshake::SelectOp>([&](handshake::SelectOp selectOp) {
         // Data bitwidth

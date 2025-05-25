@@ -150,10 +150,11 @@ void HandshakePlaceBuffersPass::runDynamaticPass() {
     return signalPassFailure();
 
   // run the delay selection logic again, writing it to the IR for processing in
-  // the backend - placeholder logic writes targetCP for testing.
+  // the backend
   // In order tp avoid interleaving this IR writing with the value extraction,
   // we keep it seperate. this does mean redudant logic, but the Database
   // parsing is not a performance bottleneck, so this should be acceptable.
+  // TODO : this should go into a bespoke function
 
   TimingDatabase timingDB(&getContext());
   if (failed(TimingDatabase::readFromJSON(timingModels, timingDB)))
