@@ -155,6 +155,9 @@ def main():
     sys.stderr.write(f"Error parsing parameters: {e}")
     sys.exit(1)
 
+# Display the selected_delay if present
+  if 'selected_delay' in parameters:
+    print(f"PYTHON GENERATOR - Selected delay for {args.name}: {parameters['selected_delay']}", file=sys.stderr)
   # Printing parameters for diagnostic purposes
   header = f"-- {args.name} : {args.type}({parameters})\n\n"
 

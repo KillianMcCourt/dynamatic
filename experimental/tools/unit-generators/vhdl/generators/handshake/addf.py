@@ -5,6 +5,10 @@ from generators.handshake.oehb import generate_oehb
 
 
 def generate_addf(name, params):
+  selected_delay = params.get("selected_delay", 3.75)  # Default to 3.75ns
+  bitwidth = params.get("bitwidth", 64)  # Default to 64-bit
+  
+  print(f"INFO: Generating with {bitwidth}-bit implementation (delay: {selected_delay}ns, entity: FloatingPointAdder_{bitwidth}_{selected_delay})")
   is_double = params["is_double"]
   extra_signals = params["extra_signals"]
 

@@ -648,9 +648,13 @@ ModuleDiscriminator::ModuleDiscriminator(Operation *op) {
             handshake::XOrIOp, handshake::SIToFPOp, handshake::FPToSIOp,
             handshake::AbsFOp>([&](auto) {
         // Bitwidth
-        addType("DATA_TYPE", op->getOperand(0));
-        if (auto delayAttr = op->getAttrOfType<FloatAttr>("selected_delay"))
-          addParam("SELECTED_DELAY", delayAttr);
+        auto delayAttr = op->getAttrOfType<FloatAttr>("selected_delay");
+        if (!delayAttr) {
+          llvm::errs() << "Missing 'selected_delay' attribute in op: "
+                       << op->getName() << "\n";
+          delayAttr = FloatAttr::get(FloatType::getF64(op->getContext()), 0.0);
+        }
+        addParam("SELECTED_DELAY", delayAttr);
       })
       .Case<handshake::SelectOp>([&](handshake::SelectOp selectOp) {
         // Data bitwidth
