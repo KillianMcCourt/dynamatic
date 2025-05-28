@@ -4,14 +4,33 @@ from generators.support.delay_buffer import generate_delay_buffer
 from generators.handshake.oehb import generate_oehb
 
 
+import os
+
+def check_wrapper_exists(selected_delay, bitwidth):
+    selected_delay = str(selected_delay).replace(".", ",")
+    base_path = "/home/kmccourt/dynamatic/experimental/tools/unit-generators/vhdl/generators/handshake/placeholder_wrapper_folder"
+    expected_filename = f"wrapper_{selected_delay}_{bitwidth}.vhd"
+    expected_path = os.path.join(base_path, expected_filename)
+
+    if os.path.isfile(expected_path):
+        with open(expected_path, "r") as f:
+            contents = f.read()
+            print(f"=== Found wrapper: {expected_filename} ===")
+            print(contents)
+    else:
+        raise FileNotFoundError(
+            f"ERROR: Expected wrapper file '{expected_filename}' not found in {base_path}"
+        )
+
 def generate_addf(name, params):
-  selected_delay = params.get("selected_delay", 3.75)  # Default to 3.75ns
+  selected_delay = params.get("selected_delay", 0)  # Default to 3.75ns
   bitwidth = params.get("bitwidth", 64)  # Default to 64-bit
   
   print(f"INFO: Generating with {bitwidth}-bit implementation (delay: {selected_delay}ns, entity: FloatingPointAdder_{bitwidth}_{selected_delay})")
   is_double = params["is_double"]
   extra_signals = params["extra_signals"]
 
+  check_wrapper_exists(selected_delay, bitwidth)
   if extra_signals:
     return _generate_addf_signal_manager(name, is_double, extra_signals)
   else:
