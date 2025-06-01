@@ -339,9 +339,8 @@ void RTLMatch::registerSelectedDelayParameter(hw::HWModuleExternOp &modOp,
   // Look for SELECTED_DELAY in hw.parameters
   if (auto paramsAttr = modOp->getAttrOfType<DictionaryAttr>("hw.parameters")) {
     if (auto selectedDelay = paramsAttr.get("SELECTED_DELAY")) {
-      if (auto floatAttr = selectedDelay.dyn_cast<FloatAttr>()) {
-        std::string delayStr =
-            llvm::formatv("{0:f}", floatAttr.getValueAsDouble()).str();
+      if (auto stringAttr = selectedDelay.dyn_cast<StringAttr>()) {
+        std::string delayStr = stringAttr.getValue().str();
         serializedParams["SELECTED_DELAY"] = delayStr;
         llvm::errs() << "SELECTED_DELAY READ: " << delayStr << "\n";
         return;
@@ -351,9 +350,8 @@ void RTLMatch::registerSelectedDelayParameter(hw::HWModuleExternOp &modOp,
 
   // Fallback: also check for direct attribute (in case some modules have it
   // there)
-  if (auto selectedDelay = modOp->getAttrOfType<FloatAttr>("selected_delay")) {
-    std::string delayStr =
-        llvm::formatv("{0:f}", selectedDelay.getValueAsDouble()).str();
+  if (auto selectedDelay = modOp->getAttrOfType<StringAttr>("selected_delay")) {
+    std::string delayStr = selectedDelay.getValue().str();
     serializedParams["SELECTED_DELAY"] = delayStr;
     llvm::errs() << "SELECTED_DELAY READ: " << delayStr << "\n";
   } else {
