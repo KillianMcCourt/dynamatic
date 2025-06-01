@@ -648,6 +648,7 @@ ModuleDiscriminator::ModuleDiscriminator(Operation *op) {
             handshake::XOrIOp, handshake::SIToFPOp, handshake::FPToSIOp,
             handshake::AbsFOp>([&](auto) {
         // Bitwidth
+        addType("DATA_TYPE", op->getOperand(0));
         auto delayAttr = op->getAttrOfType<StringAttr>("selected_delay");
         if (!delayAttr) {
           llvm::errs() << "Missing 'selected_delay' attribute in op: "
