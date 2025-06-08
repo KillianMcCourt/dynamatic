@@ -649,6 +649,7 @@ ModuleDiscriminator::ModuleDiscriminator(Operation *op) {
             handshake::AbsFOp>([&](auto) {
         // Bitwidth
         addType("DATA_TYPE", op->getOperand(0));
+        // Internal delay registration
         auto delayAttr = op->getAttrOfType<StringAttr>("internal_delay");
         if (!delayAttr) {
           delayAttr = StringAttr::get(op->getContext(), "0.0");
