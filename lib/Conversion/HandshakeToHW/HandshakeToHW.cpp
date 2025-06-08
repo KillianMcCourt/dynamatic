@@ -649,11 +649,11 @@ ModuleDiscriminator::ModuleDiscriminator(Operation *op) {
             handshake::AbsFOp>([&](auto) {
         // Bitwidth
         addType("DATA_TYPE", op->getOperand(0));
-        auto delayAttr = op->getAttrOfType<StringAttr>("selected_delay");
+        auto delayAttr = op->getAttrOfType<StringAttr>("internal_delay");
         if (!delayAttr) {
           delayAttr = StringAttr::get(op->getContext(), "0.0");
         }
-        addParam("SELECTED_DELAY", delayAttr);
+        addParam("INTERNAL_DELAY", delayAttr);
       })
       .Case<handshake::SelectOp>([&](handshake::SelectOp selectOp) {
         // Data bitwidth
