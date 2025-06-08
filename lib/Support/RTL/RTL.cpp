@@ -343,7 +343,6 @@ void RTLMatch::registerSelectedDelayParameter(hw::HWModuleExternOp &modOp,
       if (auto stringAttr = selectedDelay.dyn_cast<StringAttr>()) {
         std::string delayStr = stringAttr.getValue().str();
         serializedParams["SELECTED_DELAY"] = delayStr;
-        llvm::errs() << "SELECTED_DELAY READ: " << delayStr << "\n";
         return;
       }
     }
@@ -354,10 +353,8 @@ void RTLMatch::registerSelectedDelayParameter(hw::HWModuleExternOp &modOp,
   if (auto selectedDelay = modOp->getAttrOfType<StringAttr>("selected_delay")) {
     std::string delayStr = selectedDelay.getValue().str();
     serializedParams["SELECTED_DELAY"] = delayStr;
-    llvm::errs() << "SELECTED_DELAY READ: " << delayStr << "\n";
   } else {
     serializedParams["SELECTED_DELAY"] = "0.0";
-    llvm::errs() << "SELECTED_DELAY DEFAULTED: 0.0\n";
   }
 }
 

@@ -127,6 +127,10 @@ public:
     return success();
   }
 
+  // Similarly to getDelayCeilMetric, uses Ceil logic to find the highest delay
+  // that does not exceed the target period. Howver, it returns this delay,
+  // instead of returning the metric value at that delay. Used for setting the
+  // delay in the IR.
   LogicalResult getDelayCeilValue(double targetPeriod, double &delay) const {
     std::optional<double> opDelayCeil;
 
