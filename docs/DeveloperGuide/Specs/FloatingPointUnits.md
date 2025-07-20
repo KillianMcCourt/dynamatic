@@ -92,11 +92,16 @@ For more information related to timing information, please refer to [this markdo
 
 This section presents some reference side-by-side comparisons of operating frequency and ressource usage for common 32-bit operators, between FloPoCo and Vivado.. All the data presented was obtained by perfoming a place and route in Vivado 2019.1 and using the provided timing and utilsiation reports. 
 
+## Resource Usage vs Frequency
 
+### SRLs vs Frequency  
+![SRLs vs Frequency](https://github.com/user-attachments/assets/e784952a-eb40-4004-8343-30b100aae9c1)
 
-<img width="4459" height="2458" alt="comparison_srls_vs_frequency" src="https://github.com/user-attachments/assets/e784952a-eb40-4004-8343-30b100aae9c1" />
-<img width="4460" height="2458" alt="comparison_registers_vs_frequency" src="https://github.com/user-attachments/assets/62695bc4-72ef-49b1-a340-a9692015161c" />
-<img width="4459" height="2458" alt="comparison_luts_vs_frequency" src="https://github.com/user-attachments/assets/4ca20ecc-cb69-4cd6-891f-7a13e5fe35c1" />
-<img width="4467" height="2458" alt="comparison_dsps_vs_frequency" src="https://github.com/user-attachments/assets/4189efda-ce43-47f6-a331-649d6990de6c" />
+### Registers vs Frequency  
+![Registers vs Frequency](https://github.com/user-attachments/assets/62695bc4-72ef-49b1-a340-a9692015161c)
 
+### LUTs vs Frequency  
+![LUTs vs Frequency](https://github.com/user-attachments/assets/4ca20ecc-cb69-4cd6-891f-7a13e5fe35c1)
 
+### DSPs vs Frequency  
+![DSPs vs Frequency](https://github.com/user-attachments/assets/4189efda-ce43-47f6-a331-649d6990de6c)
